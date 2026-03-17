@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UCSP Lessons 5 & 6 Reviewer — Flashcards</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #ffffff;
+    --bg-secondary: #f5f5f3;
+    --bg-tertiary: #eeece8;
+    --text: #1a1a1a;
+    --text-secondary: #666660;
+    --border: rgba(0,0,0,0.12);
+    --border-md: rgba(0,0,0,0.22);
+    --blue: #185FA5;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1c1c1a;
+      --bg-secondary: #252522;
+      --bg-tertiary: #2e2e2b;
+      --text: #f0ede8;
+      --text-secondary: #999890;
+      --border: rgba(255,255,255,0.1);
+      --border-md: rgba(255,255,255,0.2);
+      --blue: #5BA4E8;
+    }
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: var(--bg-tertiary);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 2rem 1rem;
+  }
+
+  .page-wrap { max-width: 680px; margin: 0 auto; }
+
+  header { text-align: center; margin-bottom: 2rem; }
+  header h1 { font-size: 22px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
+  header p { font-size: 14px; color: var(--text-secondary); }
+
+  .lesson-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 1.25rem; }
+
+  .tab-btn {
+    padding: 6px 13px; border-radius: 20px;
+    border: 0.5px solid var(--border-md);
+    background: var(--bg); color: var(--text-secondary);
+    font-size: 13px; cursor: pointer; transition: all 0.15s; font-family: inherit;
+  }
+  .tab-btn:hover { background: var(--bg-secondary); }
+  .tab-btn.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+
+  .progress-row { display: flex; align-items: center; gap: 10px; margin-bottom: 1rem; }
+  .prog-bar { flex: 1; height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .prog-fill { height: 100%; background: var(--blue); border-radius: 3px; transition: width 0.3s; }
+  .prog-label { font-size: 12px; color: var(--text-secondary); white-space: nowrap; }
+
+  .card-area {
+    perspective: 900px; margin-bottom: 1rem;
+    cursor: pointer; user-select: none; min-height: 220px;
+  }
+  .card-inner {
+    position: relative; width: 100%; min-height: 220px;
+    transform-style: preserve-3d; transition: transform 0.45s;
+  }
+  .card-inner.flipped { transform: rotateY(180deg); }
+  .card-face {
+    position: absolute; width: 100%; min-height: 220px;
+    backface-visibility: hidden; -webkit-backface-visibility: hidden;
+    border: 0.5px solid var(--border); border-radius: var(--radius-lg);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 2rem 1.5rem; text-align: center;
+  }
+  .card-front { background: var(--bg); }
+  .card-back  { background: var(--bg-secondary); transform: rotateY(180deg); }
+
+  .lesson-label {
+    display: inline-block; font-size: 11px; font-weight: 500;
+    padding: 3px 10px; border-radius: 12px; margin-bottom: 0.75rem; letter-spacing: 0.02em;
+  }
+  .card-tag {
+    font-size: 11px; color: var(--text-secondary);
+    text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.75rem;
+  }
+  .card-q { font-size: 20px; font-weight: 500; color: var(--text); line-height: 1.5; }
+  .card-a { font-size: 15px; color: var(--text); line-height: 1.7; }
+  .card-hint { font-size: 12px; color: var(--text-secondary); margin-top: 1.25rem; }
+
+  .nav-row {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 8px; margin-bottom: 0.75rem;
+  }
+  .nav-btn, .shuffle-btn {
+    padding: 8px 20px; border-radius: var(--radius-md);
+    border: 0.5px solid var(--border-md);
+    background: var(--bg); color: var(--text);
+    font-size: 14px; cursor: pointer; transition: background 0.12s; font-family: inherit;
+  }
+  .nav-btn:hover, .shuffle-btn:hover { background: var(--bg-secondary); }
+  .nav-btn:disabled { opacity: 0.35; cursor: default; }
+  .shuffle-btn { color: var(--text-secondary); font-size: 13px; }
+
+  .counter { font-size: 13px; color: var(--text-secondary); text-align: center; margin-top: 0.5rem; }
+
+  .keyboard-hint {
+    text-align: center; font-size: 12px; color: var(--text-secondary);
+    margin-top: 1.5rem; padding-top: 1rem; border-top: 0.5px solid var(--border);
+  }
+  kbd {
+    display: inline-block; padding: 1px 6px;
+    border: 0.5px solid var(--border-md); border-radius: 4px;
+    font-size: 11px; font-family: inherit; background: var(--bg-secondary);
+  }
+</style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <header>
+    <h1>UCSP Lessons 5 &amp; 6 Reviewer</h1>
+    <p>Flashcards — Understanding Culture, Society, and Politics</p>
+  </header>
+
+  <div class="lesson-tabs" id="tabs"></div>
+
+  <div class="progress-row">
+    <div class="prog-bar"><div class="prog-fill" id="prog-fill"></div></div>
+    <span class="prog-label" id="prog-label">1 / 1</span>
+  </div>
+
+  <div class="card-area" id="card-area" onclick="flipCard()">
+    <div class="card-inner" id="card-inner">
+      <div class="card-face card-front">
+        <div class="lesson-label" id="card-lesson-tag"></div>
+        <div class="card-tag">Term / Concept</div>
+        <div class="card-q" id="card-q">Loading...</div>
+        <div class="card-hint">Click to reveal answer</div>
+      </div>
+      <div class="card-face card-back">
+        <div class="card-tag">Definition / Answer</div>
+        <div class="card-a" id="card-a"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-row">
+    <button class="nav-btn" id="prev-btn" onclick="move(-1)">&#8592; Prev</button>
+    <button class="shuffle-btn" onclick="shuffleDeck()">&#x21C4; Shuffle</button>
+    <button class="nav-btn" id="next-btn" onclick="move(1)">Next &#8594;</button>
+  </div>
+
+  <div class="counter" id="counter"></div>
+
+  <div class="keyboard-hint">
+    <kbd>Space</kbd> flip &nbsp;&nbsp; <kbd>&#8592;</kbd> prev &nbsp;&nbsp; <kbd>&#8594;</kbd> next &nbsp;&nbsp; <kbd>S</kbd> shuffle
+  </div>
+
+</div>
+
+<script>
+const LESSONS = {
+  "All": null,
+
+  "Lesson 5: Social Groups": [
+    ["Social Group (Muzafer Sherif)","A set of individuals who interact and share: common motives and goals, division of labor (roles), established status, accepted norms and values, and accepted sanctions (rewards or punishments)."],
+    ["Primary Group","Small, close-knit, intimate, and lasting relationships. Members genuinely care for each other. Examples: Family, close friends, husband & wife, teacher & students."],
+    ["Secondary Group","Larger groups with specific goals; formal and impersonal. Examples: School orgs, corporations, professional associations, work colleagues."],
+    ["Function of Primary Group","Shapes your personality, values, morals, and beliefs — your core identity."],
+    ["Function of Secondary Group","Fulfills specific practical needs; brings social awareness and social change."],
+    ["In-Groups","Groups you personally identify with — you feel loyalty and belonging. Examples: Your school, fraternity/sorority, favorite fandom."],
+    ["Out-Groups","Groups you do NOT identify with — you may feel dislike or rivalry. Examples: Competitors, rivals, opponents."],
+    ["Reference Groups","Groups or social categories that guide your beliefs, attitudes, values, and behavior. Includes people worth imitating AND people you should NOT follow."],
+    ["Social Network","A web of social relationships that connects individuals to one another. Helps with career, emotional support, community, and spreading culture."],
+    ["Gemeinschaft","A type of community that is personal and intimate. Social bonds are strong and emotional. Cooperation is based on tradition and loyalty. Examples: Indigenous communities, Bayanihan spirit."],
+    ["Gesellschaft","A type of society that is impersonal and formal. Social bonds are weak and rational. Cooperation is based on contracts and rules. Examples: BGC, BPO companies, government bureaucracy."],
+    ["Gemeinschaft vs. Gesellschaft — Identity","Gemeinschaft = Collective ('we'). Gesellschaft = Individualistic ('I')."],
+    ["Accepted Sanctions","Rewards or punishments given for following or breaking the norms of a social group."],
+  ],
+
+  "6.1: Kinship & Marriage": [
+    ["Kinship","Socially recognized relationships between people who are biologically related OR given the status of relatives through marriage, adoption, or rituals."],
+    ["Consanguineal Kinship","Kinship by blood — based on biological/descent links. Example: You and your parents or siblings."],
+    ["Affinal Kinship","Kinship by marriage — established through legal/social contracts. Example: Spouses; in-laws (mother-in-law, brother-in-law)."],
+    ["Ritual Kinship (Compadrazgo)","Kinship formed through religious/social rituals. Example: Godparents (ninong/ninang) and godchildren."],
+    ["Fictive Kinship","Treating close friends like family even without legal or biological link. Example: Calling your best friend your 'brother' or 'sister'."],
+    ["Political Dynasty","Several members of the SAME family occupy elected/appointed government positions, often succeeding each other."],
+    ["Affinal Politics","Marriage is used as a political tool to forge alliances between two powerful families."],
+    ["Padrino System","Gaining favor, promotion, or appointment through family/ritual ties rather than merit."],
+    ["Oligarchs","Wealthy, influential families/groups controlling significant economic power."],
+    ["Cronies","Individuals or businesses gaining special favors (contracts, tax breaks) from political leaders."],
+    ["Descent","Socially recognized links between ancestors and descendants; how a person claims kinship through a common ancestor. Determines group membership, family authority, and where married couples reside."],
+    ["Patrilineal Descent","Traces ancestry ONLY through the father's line. Example: Traditional Chinese/Arab societies — property and family name passed from father to son."],
+    ["Matrilineal Descent","Traces ancestry ONLY through the mother's line. Example: Minangkabau (Indonesia) and Khasi (India) — women own land, inheritance passes mother to daughter."],
+    ["Bilateral Descent","Recognizes BOTH mother's and father's sides equally. Example: Philippines and most Western societies."],
+    ["Ambilineal Descent","Individual can CHOOSE to affiliate with either parent's descent group. Example: Some Pacific Island societies — join the group with better land/resources."],
+    ["Patrilocal Residence","Couple lives with or near the HUSBAND'S family."],
+    ["Matrilocal Residence","Couple lives with or near the WIFE'S family."],
+    ["Avunculocal Residence","Couple lives with or near the husband's MATERNAL UNCLE (mother's brother)."],
+    ["Ambilocal / Bilocal Residence","Couple CHOOSES to live with either family — based on wealth, space, or preference."],
+    ["Neolocal Residence","Couple establishes a NEW, INDEPENDENT home — separate from both families."],
+    ["Marriage (Family Code, Art. 1)","A special contract of permanent union between a man and a woman, in accordance with law, for conjugal and family life."],
+    ["Essential Requisites of Marriage (Art. 2)","Legal capacity (18+ years old, male and female, not related by prohibited degrees, not already married) and freely given consent before the solemnizing officer."],
+    ["Formal Requisites of Marriage (Art. 3)","Authority of a solemnizing officer, valid marriage license, and a ceremony with the couple + at least 2 witnesses of legal age."],
+    ["Void Marriage (Art. 35)","Party below 18, bigamous marriages, or no marriage license."],
+    ["Psychological Incapacity (Art. 36)","One party is mentally unable to fulfill essential marital obligations — grounds for nullity."],
+    ["Incestuous Marriage (Art. 37)","Marriage between ascendants/descendants (e.g., father-daughter) or siblings — void."],
+    ["Endogamy","Marrying WITHIN your social group, caste, or ethnic group ('Marrying In')."],
+    ["Exogamy","Marrying OUTSIDE your own clan, lineage, or village ('Marrying Out')."],
+    ["Monogamy","One person married to ONE spouse at a time."],
+    ["Polygyny","One man, multiple wives."],
+    ["Polyandry","One woman, multiple husbands."],
+    ["Nuclear Family","Two parents (usually married) + their biological or adopted children in one household."],
+    ["Extended Family","3+ generations living together — includes grandparents, aunts, uncles, cousins."],
+    ["Reconstituted / Blended Family","One or both partners bring children from previous relationships into a new family unit."],
+    ["Single-Parent Family","One solo parent raising one or more children alone."],
+    ["Grandparent Family","Grandparents raise their grandchildren because parents are absent (OFWs, death, other circumstances)."],
+  ],
+
+  "6.2: Political Structures": [
+    ["Bands (Elman Service, 1962)","Smallest political organization. Population: 20–50 (under 100). Egalitarian structure. Informal leadership by group consensus. Economy: hunting and gathering. Social control: gossip and shaming."],
+    ["Tribes","Population: 100–5,000. Egalitarian structure. Leadership by a 'Big Man' — based on charisma and generosity. Economy: horticulture and herding. Social control: rituals."],
+    ["Chiefdoms","Population: 5,000–50,000. Ranked structure (by bloodline distance). Permanent and hereditary leadership. Redistributive economy. Social control: Chief's decree."],
+    ["States","Population: 100,000s to billions. Stratified (classes: upper/middle/lower). Legal-rational and bureaucratic leadership. Industry, trade, service sector economy. Social control: laws."],
+    ["Elements of the State — People","The permanent population residing within its borders."],
+    ["Elements of the State — Territory","The fixed geographical area (land, water, and air) belonging to the state."],
+    ["Elements of the State — Government","The agency through which the will of the state is expressed."],
+    ["Elements of the State — Sovereignty","The supreme power to command obedience and be free from external control."],
+    ["Executive Branch (PH)","Enforces and implements laws. Composed of: President, Vice President, Cabinet Secretaries."],
+    ["Legislative Branch (PH)","Creates, amends, and repeals laws. Bicameral Congress: Senate (24 senators elected at-large) + House of Representatives."],
+    ["Judicial Branch (PH)","Interprets laws. Composed of: Supreme Court (1 Chief Justice + 14 Associate Justices) + lower courts."],
+    ["Internal Sovereignty","The state's power to govern its own people and territory without internal challenge."],
+    ["External Sovereignty","Independence and freedom from outside control or interference by other states/international bodies."],
+    ["State (Political)","A legal entity — group of people occupying a territory under organized government with sovereignty."],
+    ["Nation (Socio-Cultural)","A group of people sharing common culture: language, religion, ethnicity, or historical experience."],
+    ["Country (Geographical)","The physical territory or land inhabited by a nation or governed by a state."],
+    ["Power","The ability to influence or achieve desired ends DESPITE resistance from others."],
+    ["Authority","Power that is RECOGNIZED and ACCEPTED as rightful — backed by rules, laws, or norms."],
+    ["Legitimacy","The popular belief that a ruler or system has the RIGHT to govern."],
+    ["Traditional Authority (Weber)","Power legitimized by long-standing customs, beliefs, and social structures. Examples: Monarchies, tribal datus/chiefs, religious leaders."],
+    ["Charismatic Authority (Weber)","Power legitimized by a leader's exceptional personal qualities that inspire devotion. Examples: Nelson Mandela, Mahatma Gandhi."],
+    ["Legal-Rational Authority (Weber)","Power legitimized by legally enacted rules and regulations. Examples: Democratic governments, presidents."],
+  ],
+
+  "6.3: Economic Institutions": [
+    ["Economic Institutions","A stable set of norms, rules, and structures that govern the production, distribution, and consumption of goods and services. Determines who gets what, how they get it, and who owns the resources."],
+    ["Reciprocity","Exchange of goods/services between individuals of relatively equal status."],
+    ["Generalized Reciprocity","Giving WITHOUT expecting an immediate or specific return. Example: Giving birthday gifts."],
+    ["Balanced Reciprocity","Expecting something of equal value in return within a timeframe. Example: Trading favors; barter."],
+    ["Negative Reciprocity","Aiming to gain the MOST while giving the LEAST; often involves trickery. Example: Selling fake items at original prices."],
+    ["Transfers","One-way payment where NO goods or services are given in return. Examples: SSS/GSIS pension payments (social transfers), OFW remittances (private transfers)."],
+    ["Redistribution","Resources are collected by a central authority and then reallocated to the community. Steps: Collection → Storage/Management → Dispersal."],
+    ["Market Transactions","Exchange of goods/services through a market where buyers and sellers agree on price and quantity."],
+    ["Law of Demand","↑ Price = ↓ Quantity Demanded (and vice versa)."],
+    ["Law of Supply","↑ Price = ↑ Quantity Supplied (and vice versa)."],
+    ["Law of Supply & Demand","Supply > Demand → Prices FALL. Demand > Supply → Prices RISE."],
+    ["State as Regulator","Creates laws to prevent monopolies, ensure fair competition, and protect consumers. Example: Philippine Competition Act (RA 10667)."],
+    ["State as Protector","Protects the rights of the vulnerable in the market. Example: Consumer Act (RA 7394) protects against deceptive sales and unsafe products."],
+    ["State as Provider","Provides services that the market won't because they're not profitable. Example: Public education, national defense."],
+  ],
+
+  "6.4: Non-State Institutions": [
+    ["Non-State Institutions","Organizations NOT part of the official government but still play a significant role in the social, economic, and political development of a country."],
+    ["Commercial Banks","Manage withdrawals/deposits; supply loans to individuals and businesses. Examples: BDO, Metrobank, BPI."],
+    ["Investment Banks","Intermediary between large corporations (need money) and investors (have money). Examples: First Metro Investment Corporation, BPI Capital Corporation."],
+    ["Digital Banks","Offers financial services entirely through digital platforms. Examples: GCash, Maya, GoTyme, Maribank (BSP Circular No. 1105, 2021)."],
+    ["Corporation","An organization created by shareholders, legally recognized to act as a single entity — can enter contracts, borrow money, hire employees, own assets, and pay taxes."],
+    ["Stock Corporations","Generate wealth through shares of stocks. Examples: San Miguel Corporation, SM Investments, Ayala Corporation."],
+    ["Non-Stock Corporations","Established for public service, charity, or religious purposes (non-profit). Examples: ABS-CBN Foundation, Red Cross."],
+    ["Multinational/Transnational Corporations","Large companies operating in SEVERAL COUNTRIES. Examples: Nestlé, Shell, McDonald's."],
+    ["Cooperatives","Autonomous groups of people voluntarily united to meet common economic, social, and cultural needs through a jointly owned enterprise."],
+    ["Trade/Labor Unions","Workers united to negotiate better wages and working conditions. Example: Kilusang Mayo Uno (KMU)."],
+    ["Transnational Advocacy Groups","Networks of activists/orgs from different countries influencing global policies, laws, or norms. Examples: Greenpeace, Amnesty International, Human Rights Watch."],
+    ["Development Agencies","Provide financial, technical, and humanitarian help to developing countries. Multilateral: World Bank, ADB. Bilateral: USAID, JICA."],
+    ["International Organizations","Multi-member institutions working on global issues (peace, health, security). Examples: WHO, United Nations (UN)."],
+  ],
+
+  "6.5: Education": [
+    ["Formal Education","Systematic, structured, and hierarchically organized educational model governed by laws and norms."],
+    ["Non-Formal Education","Organized educational activities OUTSIDE the formal system, designed for specific segments of the population."],
+    ["Informal Education","Lifelong process of acquiring attitudes, values, skills, and knowledge from one's environment and daily experience (Coombs, 1973)."],
+    ["DepEd (Department of Education)","Regulates Kindergarten (RA 10157), Elementary, and Secondary (RA 10533 — K–12 Law) education in the Philippines."],
+    ["CHED (Commission on Higher Education)","Regulates Tertiary education in the Philippines. Based on RA 7722 — Higher Education Act of 1994."],
+    ["TESDA","Regulates Technical-Vocational Education and Training (TVET) for a globally competitive workforce. Based on RA 7796."],
+    ["Alternative Learning System (ALS)","A parallel learning system for those who CANNOT access formal education (economic, geographic, or personal reasons). Governed by RA 11510 — ALS Act of 2020."],
+    ["MOOCs","Massive Open Online Courses — free, open, flexible online learning for large audiences. Complements traditional schooling."],
+    ["Education as Productive Citizenry","Equips individuals with knowledge, skills, and values to contribute to the nation's economic and social stability."],
+    ["Human Capital Development","Education increases a person's 'value' to become more marketable in the labor force."],
+    ["Self-Actualization (Maslow)","The highest human need — becoming everything one is capable of becoming. A primary function of education."],
+    ["UDHR Article 26","Everyone has the right to free education, at least at elementary level; elementary education shall be compulsory."],
+    ["SDG 4 — Quality Education","Ensure inclusive and equitable quality education and promote lifelong learning for all by 2030."],
+    ["RA 10931","Universal Access to Quality Tertiary Education Act — free tuition in state universities."],
+    ["1987 Constitution, Art. XIV Sec. 2","State shall establish and maintain FREE public education at elementary and high school levels."],
+  ],
+
+  "6.6: Religion": [
+    ["Religion","From Latin 'religare' (to bind/tie back). A set of attitudes, beliefs, and practices pertaining to supernatural beings and forces. A social institution involving beliefs based on a conception of the sacred."],
+    ["Animism","Belief that humans, animals, plants, rocks, natural phenomena (thunder), and geographic features ALL possess a spiritual essence/soul."],
+    ["Anito","Ancestor/nature spirits in pre-colonial Philippines — central to animistic belief."],
+    ["Babaylan/Katalonan","Spiritual leader (usually a woman) in pre-colonial Philippines who bridges the physical and spirit world."],
+    ["Polytheism","Belief in and worship of MANY deities. Examples: Greek, Roman, Egyptian, and Hindu gods and goddesses."],
+    ["Monotheism","Belief in the existence of ONLY ONE god."],
+    ["Judaism","Monotheistic religion. Founder/figure: Abraham & Moses. Sacred text: Torah/Pentateuch. Key belief: The COVENANT between God and His people (Israelites)."],
+    ["Christianity","Monotheistic religion. Founded by Jesus Christ. Sacred text: Holy Bible. Key belief: The TRINITY — God the Father, God the Son, God the Holy Spirit."],
+    ["Islam","Monotheistic religion. Founded by Prophet Muhammad. Sacred text: Qur'an. Key belief: The FIVE PILLARS — Shahada, Salah, Zakat, Sawm, Hajj."],
+    ["Five Pillars of Islam","Shahada (faith declaration), Salah (5 daily prayers), Zakat (almsgiving), Sawm (fasting in Ramadan), Hajj (pilgrimage to Mecca)."],
+    ["Denomination","A large, highly organized religious body well-integrated into society, NOT formally linked to the state. Formed due to historical splits or differing interpretations. Example: Christianity → Roman Catholic, Baptist, Methodist, Lutheran."],
+    ["Sect","Small religious organization that BROKE AWAY from an established denomination to restore 'pure' original doctrines. Examples: Amish, Jehovah's Witnesses, Seventh-Day Adventist."],
+    ["Cult (New Religious Movement)","Religious organization largely OUTSIDE society's cultural traditions, typically centered around a CHARISMATIC LEADER. Examples: Satanism; Heaven's Gate."],
+    ["Institutionalized Religion","A religious system with a formal structure, established leadership (clergy), set doctrines, and a permanent place in the social and political order."],
+    ["1987 Constitution, Art. II Sec. 6","'The separation of Church and State shall be inviolable.' (Inviolability Clause)"],
+    ["Non-Establishment Clause","No law shall be made respecting an establishment of religion or prohibiting its free exercise. (Art. III, Sec. 5)"],
+    ["Free Exercise Clause","Freedom of religious profession and worship, without discrimination or preference — no religious test for civil or political rights. (Art. III, Sec. 5)"],
+    ["Tax Exemption (Art. VI, Sec. 28-3)","Churches, parsonages, convents, and lands/buildings used for religious purposes are EXEMPT from property taxes."],
+  ],
+
+  "6.7: Health": [
+    ["Health (WHO, 1946)","State of complete physical, mental, and social well-being — NOT merely the absence of disease or infirmity."],
+    ["Western Biopsychosocial Model (George Engel, 1977)","Focuses on biological factors (germs, genetics), psychological states (behaviors, emotions), and social factors (socio-economic status, living conditions). Relies on science, technology, and licensed professionals."],
+    ["Traditional Medicine (WHO, 2013)","Total of knowledge, skills, and practices based on indigenous cultural theories, beliefs, and experiences used for health maintenance. Practitioners: Albularyo, Manghihilot, Mangtatawas."],
+    ["Alternative Medicine","Healthcare practices used INSTEAD OF or ALONGSIDE conventional medicine — often rooted in tradition but with limited scientific evidence. Examples: Herbal medicines, acupuncture, yoga, chiropractic."],
+    ["Binat","Relapse that occurs when a recovering person returns to activity TOO EARLY before fully healing."],
+    ["Bughat","When a mother who recently gave birth develops tremors, headaches, or weakness after doing chores or bathing too soon."],
+    ["Buyag / Usog","A child or infant gets suddenly ill (fever, bloating, crying) after an encounter with a stranger or someone with a 'strong soul'."],
+    ["Amok","Sudden, spontaneous episode of indiscriminate homicidal or destructive behavior — preceded by brooding, ending in exhaustion and amnesia. (APA, 2013)"],
+    ["Kulam","Uses a doll/representation of the victim — whatever the practitioner does to the doll is believed to happen to the victim. (Tan, 2008)"],
+    ["Barang","A Mambabarang uses insects (beetles, cockroaches) or natural objects as 'messengers' believed to enter and damage the victim's body. (Apostol, 2010)"],
+    ["Lihi / Paglilihi","During the FIRST TRIMESTER of pregnancy, the mother experiences intense food cravings, aversions, and heightened emotional sensitivity."],
+    ["WHO Constitution (1946)","The highest attainable standard of health is a FUNDAMENTAL RIGHT of every human being — without distinction of race, religion, political belief, or economic/social condition."],
+    ["UDHR Article 25 (1948)","Everyone has the right to a standard of living adequate for health and well-being, including medical care and social services."],
+    ["RA 11223 — Universal Health Care Act (2019)","Ensures every Filipino has access to preventive, promotive, curative, rehabilitative, and palliative care WITHOUT financial hardship."],
+    ["1987 PH Constitution, Art. II Sec. 15","'The State shall protect and promote the right to health of the people and instill health consciousness among them.'"],
+  ],
+};
+
+// ── Lesson colors ──────────────────────────────────────────────
+const COLORS = {
+  "All":                      { bg: "#E8F0FE", text: "#185FA5" },
+  "Lesson 5: Social Groups":  { bg: "#FDE8F5", text: "#8B1A6B" },
+  "6.1: Kinship & Marriage":  { bg: "#FEF3E2", text: "#9A5B00" },
+  "6.2: Political Structures":{ bg: "#E8F8F0", text: "#1A7A50" },
+  "6.3: Economic Institutions":{ bg: "#FDE8E8", text: "#A01818" },
+  "6.4: Non-State Institutions":{ bg: "#EDE8FE", text: "#5B1AAA" },
+  "6.5: Education":           { bg: "#E8F6FE", text: "#0A6B9A" },
+  "6.6: Religion":            { bg: "#FEF7E8", text: "#8A6A00" },
+  "6.7: Health":              { bg: "#E8FEF0", text: "#0A7A3C" },
+};
+
+// ── State ──────────────────────────────────────────────────────
+let activeLesson = "All";
+let deck = [];
+let idx = 0;
+
+function buildAllCards() {
+  let all = [];
+  for (const [lesson, cards] of Object.entries(LESSONS)) {
+    if (!cards) continue;
+    cards.forEach(c => all.push({ lesson, q: c[0], a: c[1] }));
+  }
+  return all;
+}
+
+function getDeck(lesson) {
+  if (lesson === "All") return buildAllCards();
+  return (LESSONS[lesson] || []).map(c => ({ lesson, q: c[0], a: c[1] }));
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+// ── Render ─────────────────────────────────────────────────────
+function render() {
+  const card = deck[idx];
+  const ci = document.getElementById("card-inner");
+  ci.classList.remove("flipped");
+
+  const lt = document.getElementById("card-lesson-tag");
+  const col = COLORS[card.lesson] || COLORS["All"];
+  lt.textContent = card.lesson;
+  lt.style.background = col.bg;
+  lt.style.color = col.text;
+
+  document.getElementById("card-q").textContent = card.q;
+  document.getElementById("card-a").textContent = card.a;
+
+  const total = deck.length;
+  document.getElementById("prog-fill").style.width = ((idx + 1) / total * 100) + "%";
+  document.getElementById("prog-label").textContent = `${idx + 1} / ${total}`;
+  document.getElementById("counter").textContent = `Card ${idx + 1} of ${total}`;
+  document.getElementById("prev-btn").disabled = idx === 0;
+  document.getElementById("next-btn").disabled = idx === total - 1;
+}
+
+function flipCard() {
+  document.getElementById("card-inner").classList.toggle("flipped");
+}
+
+function move(dir) {
+  const ni = idx + dir;
+  if (ni < 0 || ni >= deck.length) return;
+  idx = ni;
+  render();
+}
+
+function shuffleDeck() {
+  shuffle(deck);
+  idx = 0;
+  render();
+}
+
+function switchLesson(lesson) {
+  activeLesson = lesson;
+  deck = getDeck(lesson);
+  idx = 0;
+  document.querySelectorAll(".tab-btn").forEach(b =>
+    b.classList.toggle("active", b.dataset.lesson === lesson)
+  );
+  render();
+}
+
+// ── Build tabs ─────────────────────────────────────────────────
+function buildTabs() {
+  const container = document.getElementById("tabs");
+  Object.keys(LESSONS).forEach(lesson => {
+    const btn = document.createElement("button");
+    btn.className = "tab-btn" + (lesson === "All" ? " active" : "");
+    btn.dataset.lesson = lesson;
+    btn.textContent = lesson;
+    btn.onclick = () => switchLesson(lesson);
+    container.appendChild(btn);
+  });
+}
+
+// ── Keyboard shortcuts ─────────────────────────────────────────
+document.addEventListener("keydown", e => {
+  if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+  if (e.key === " " || e.code === "Space") { e.preventDefault(); flipCard(); }
+  else if (e.key === "ArrowLeft")  move(-1);
+  else if (e.key === "ArrowRight") move(1);
+  else if (e.key === "s" || e.key === "S") shuffleDeck();
+});
+
+// ── Init ───────────────────────────────────────────────────────
+buildTabs();
+deck = getDeck("All");
+render();
+</script>
+</body>
+</html>
