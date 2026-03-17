@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DRRR Finals Reviewer — Flashcards</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #ffffff;
+    --bg-secondary: #f5f5f3;
+    --bg-tertiary: #eeece8;
+    --text: #1a1a1a;
+    --text-secondary: #666660;
+    --border: rgba(0,0,0,0.12);
+    --border-md: rgba(0,0,0,0.22);
+    --blue: #185FA5;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1c1c1a;
+      --bg-secondary: #252522;
+      --bg-tertiary: #2e2e2b;
+      --text: #f0ede8;
+      --text-secondary: #999890;
+      --border: rgba(255,255,255,0.1);
+      --border-md: rgba(255,255,255,0.2);
+      --blue: #5BA4E8;
+    }
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: var(--bg-tertiary);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 2rem 1rem;
+  }
+
+  .page-wrap { max-width: 680px; margin: 0 auto; }
+
+  header { text-align: center; margin-bottom: 2rem; }
+  header h1 { font-size: 22px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
+  header p { font-size: 14px; color: var(--text-secondary); }
+
+  .lesson-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 1.25rem; }
+
+  .tab-btn {
+    padding: 6px 13px; border-radius: 20px;
+    border: 0.5px solid var(--border-md);
+    background: var(--bg); color: var(--text-secondary);
+    font-size: 13px; cursor: pointer; transition: all 0.15s; font-family: inherit;
+  }
+  .tab-btn:hover { background: var(--bg-secondary); }
+  .tab-btn.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+
+  .progress-row { display: flex; align-items: center; gap: 10px; margin-bottom: 1rem; }
+  .prog-bar { flex: 1; height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .prog-fill { height: 100%; background: var(--blue); border-radius: 3px; transition: width 0.3s; }
+  .prog-label { font-size: 12px; color: var(--text-secondary); white-space: nowrap; }
+
+  .card-area {
+    perspective: 900px; margin-bottom: 1rem;
+    cursor: pointer; user-select: none; min-height: 220px;
+  }
+  .card-inner {
+    position: relative; width: 100%; min-height: 220px;
+    transform-style: preserve-3d; transition: transform 0.45s;
+  }
+  .card-inner.flipped { transform: rotateY(180deg); }
+  .card-face {
+    position: absolute; width: 100%; min-height: 220px;
+    backface-visibility: hidden; -webkit-backface-visibility: hidden;
+    border: 0.5px solid var(--border); border-radius: var(--radius-lg);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 2rem 1.5rem; text-align: center;
+  }
+  .card-front { background: var(--bg); }
+  .card-back  { background: var(--bg-secondary); transform: rotateY(180deg); }
+
+  .lesson-label {
+    display: inline-block; font-size: 11px; font-weight: 500;
+    padding: 3px 10px; border-radius: 12px; margin-bottom: 0.75rem; letter-spacing: 0.02em;
+  }
+  .card-tag {
+    font-size: 11px; color: var(--text-secondary);
+    text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.75rem;
+  }
+  .card-q { font-size: 20px; font-weight: 500; color: var(--text); line-height: 1.5; }
+  .card-a { font-size: 15px; color: var(--text); line-height: 1.7; }
+  .card-hint { font-size: 12px; color: var(--text-secondary); margin-top: 1.25rem; }
+
+  .nav-row {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 8px; margin-bottom: 0.75rem;
+  }
+  .nav-btn, .shuffle-btn {
+    padding: 8px 20px; border-radius: var(--radius-md);
+    border: 0.5px solid var(--border-md);
+    background: var(--bg); color: var(--text);
+    font-size: 14px; cursor: pointer; transition: background 0.12s; font-family: inherit;
+  }
+  .nav-btn:hover, .shuffle-btn:hover { background: var(--bg-secondary); }
+  .nav-btn:disabled { opacity: 0.35; cursor: default; }
+  .shuffle-btn { color: var(--text-secondary); font-size: 13px; }
+
+  .counter { font-size: 13px; color: var(--text-secondary); text-align: center; margin-top: 0.5rem; }
+
+  .keyboard-hint {
+    text-align: center; font-size: 12px; color: var(--text-secondary);
+    margin-top: 1.5rem; padding-top: 1rem; border-top: 0.5px solid var(--border);
+  }
+  kbd {
+    display: inline-block; padding: 1px 6px;
+    border: 0.5px solid var(--border-md); border-radius: 4px;
+    font-size: 11px; font-family: inherit; background: var(--bg-secondary);
+  }
+</style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <header>
+    <h1>DRRR Finals Reviewer</h1>
+    <p>Flashcards — Disaster Risk Reduction and Resilience</p>
+  </header>
+
+  <div class="lesson-tabs" id="tabs"></div>
+
+  <div class="progress-row">
+    <div class="prog-bar"><div class="prog-fill" id="prog-fill"></div></div>
+    <span class="prog-label" id="prog-label">1 / 1</span>
+  </div>
+
+  <div class="card-area" id="card-area" onclick="flipCard()">
+    <div class="card-inner" id="card-inner">
+      <div class="card-face card-front">
+        <div class="lesson-label" id="card-lesson-tag"></div>
+        <div class="card-tag">Term / Concept</div>
+        <div class="card-q" id="card-q">Loading...</div>
+        <div class="card-hint">Click to reveal answer</div>
+      </div>
+      <div class="card-face card-back">
+        <div class="card-tag">Definition / Answer</div>
+        <div class="card-a" id="card-a"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-row">
+    <button class="nav-btn" id="prev-btn" onclick="move(-1)">&#8592; Prev</button>
+    <button class="shuffle-btn" onclick="shuffleDeck()">&#x21C4; Shuffle</button>
+    <button class="nav-btn" id="next-btn" onclick="move(1)">Next &#8594;</button>
+  </div>
+
+  <div class="counter" id="counter"></div>
+
+  <div class="keyboard-hint">
+    <kbd>Space</kbd> flip &nbsp;&nbsp; <kbd>&#8592;</kbd> prev &nbsp;&nbsp; <kbd>&#8594;</kbd> next &nbsp;&nbsp; <kbd>S</kbd> shuffle
+  </div>
+
+</div>
+
+<script>
+const LESSONS = {
+  "All": null,
+  "DRR Overview": [
+    ["DRR (Disaster Risk Reduction)","Systematic efforts to minimize vulnerabilities and disaster risks — to avoid (prevention) or to limit (mitigation and preparedness) the effects of hazards. Done BEFORE a disaster strikes."],
+    ["Risk Identification","Step 1 of DRR. Identifies the hazard. Potential threats are identified based on experience and records, necessary for prioritizing mitigation targets."],
+    ["Risk Analysis","Step 2 of DRR. Establishes the magnitude and likelihood of occurrence of the event. Enhances the importance and priority of disaster prevention and preparedness."],
+    ["Risk Prioritization","Step 3 of DRR. Analyzes identified risks and decides the order in which their mitigation deserves time and attention."],
+    ["Risk Treatment","Step 4 of DRR. Identifies the cause of risks, evaluates treatment strategies, and prepares and implements treatment plans."],
+    ["Monitoring & Evaluation","Step 5 of DRR. Oversees the implementation progress of the disaster risk management process — a continuous control system over the threat after treating it."],
+    ["Disaster Management","The entire array of activities aimed at reducing the severity of impact of a disaster-causing event, undertaken BEFORE, DURING, and AFTER a disaster."],
+    ["Pre-event (Pre-Disaster)","Phase before a disaster. Activities: Risk Assessment, Mitigation or Prevention, and Preparedness."],
+    ["Syn-event (During Disaster)","Phase during a disaster. Activity: Emergency Response — rescue, evacuation, and relief."],
+    ["Post-event (Post-Disaster)","Phase after a disaster. Activities: Recovery, Rehabilitation, and Reconstruction."],
+    ["Community-Based DRRM","Range of actions geared towards preparedness, mitigation, and enhancing response capabilities developed by community members themselves."],
+    ["Emergency Plan","The process of assessing risks, creating plans, and implementing mitigation measures to better prepare a community for an incident."],
+    ["Survival Kit (Go Bag / Grab Bag)","Designed to be taken by an individual in case of an emergency. Contains essential survival items."],
+    ["Early Warning System","A set of capacities needed to generate and disseminate timely and meaningful warning information of possible extreme events or disasters."],
+  ],
+  "Laws & Agencies": [
+    ["Republic Act 10121","Philippine Disaster Risk Reduction and Management Act of 2010. Signed by President Gloria Macapagal Arroyo. Shifted the system from NDCC to NDRRMC."],
+    ["Republic Act 9729","Climate Change Act of 2009 — recognizes the constitutional right of the people to have a cleaner environment."],
+    ["Republic Act 10174","The People's Survival Act of 2011 — established to help achieve the objectives of climate change adaptation programs."],
+    ["RA 9514","Fire Code of the Philippines."],
+    ["NDCC","National Disaster Coordinating Council. OLD system. Reactive Mode. Only covered emergency response, rehabilitation, and reconstruction. Had 19 members."],
+    ["NDRRMC","National Disaster Risk Reduction and Management Council. NEW system under RA 10121. Proactive Mode. Covers development, prevention, mitigation, preparedness, and warning. Has 44 members."],
+    ["DOST","Department of Science and Technology — Lead agency for Disaster Prevention and Mitigation."],
+    ["DILG","Department of the Interior and Local Government — Lead agency for Disaster Preparedness."],
+    ["DSWD","Department of Social Welfare and Development — Lead agency for Disaster Response."],
+    ["NEDA","National Economic and Development Authority — Lead agency for Rehabilitation and Recovery."],
+    ["NDRRMC Functions","Empowered to: ensure multi-stakeholder participation, establish a national early warning and alert system, and develop appropriate risk transfer mechanisms."],
+    ["State of Emergency","A warning given to the people to adjust or change their normal operations and behaviour."],
+    ["State of Calamity","Condition involving mass casualty and/or major damages to property, disruption of livelihood, roads, and normal way of life as a result of a natural or human-induced hazard."],
+    ["PIA","Philippine Information Agency — government agency tasked to provide accurate and timely advice to national or local organizations and the public regarding disasters."],
+    ["PAGASA","Philippine Atmospheric, Geophysical and Astronomical Services Administration — issues weather and disaster warnings including rainfall advisories."],
+  ],
+  "ICS": [
+    ["Incident Command System (ICS)","Used to organize a community in case of any emergency regardless of magnitude. Provides a clear chain of command during disaster response."],
+    ["Incident Commander","Responsible for ALL aspects of the response — developing incident objectives and managing all incident operations."],
+    ["Command Staff","Responsible for public affairs, health and safety, and liaison activities within the incident command structure."],
+    ["Information Officer","Develops and releases information about the incident to the news media."],
+    ["Liaison Officer","Serves as the point of contact for coordinating activities between the Incident Commander and various agencies or groups."],
+    ["Safety Officer","Develops and recommends measures to the Incident Commander for assuring personnel health and safety."],
+    ["General Staff","Includes Operations, Planning, Logistics, and Finance/Administrative responsibilities."],
+    ["Operations Staff","Responsible for all operations directly applicable to the primary mission of the response."],
+    ["Planning Staff","Responsible for collecting, evaluating, and disseminating tactical information related to the incident."],
+    ["Logistics Staff","Responsible for providing facilities, services, and materials for the incident response."],
+    ["Finance & Administrative Staff","Responsible for all financial and administrative aspects of the incident."],
+  ],
+  "Hazards": [
+    ["Geological Hazards","Include volcanic eruptions, earthquakes, and landslides. Mapped using a Geohazard Map for land use planning and zoning."],
+    ["Geohazard Map","Guides land use planning and zoning. Indicates: elevation of the area, location of major waterways, and coordinates of landslide and flood-prone areas."],
+    ["Subsidence","Downward (vertical) sinking of earth materials; gradual caving in of land. Causes: dissolution of limestones, excessive groundwater withdrawal, mining, oil, and gas extraction."],
+    ["Liquefaction","The phenomenon where the strength and stiffness of soil are reduced by earthquake shaking."],
+    ["Saltwater Intrusion","Process by which seawater infiltrates a coastal aquifer, leading to contamination of fresh groundwater."],
+    ["Hydrometeorological Hazards","Processes involving the interaction of the atmosphere, bodies of water, and land — posing threat to lives and human properties."],
+    ["Hydrometeorological Map","A map indicating areas vulnerable to hazards caused by tropical cyclones, floods, and tornadoes."],
+    ["Geologic Hazard Examples","Earthquake, landslide, volcanic eruption, rapid sediment movement, subsidence, sinkhole, impacts with space objects."],
+    ["Hydrologic Hazard Examples","Flood, drought, wave action, glacier rapid advance."],
+    ["Atmospheric Hazard Examples","Storm, hail, thunderstorm, excessive rainfall, heavy snowfall, tornadoes, extreme temperature."],
+    ["Biologic Hazard Examples","Pests and locust infestation, epidemic in humans, plants, and animals."],
+    ["Man-Made Hazard Examples","Transport accident, computer virus, weapons of mass destruction (WMD)."],
+    ["Thunderstorm","A violent, transient weather disturbance associated with tall cumulonimbus clouds accompanied by lightning, thunder, strong winds, and intense rainfall."],
+    ["Flooding","Abnormal rise of water level in rivers, coastal areas, plains, and urbanized centers — result of natural phenomenon, human activities, or both. Metro Manila flooding is due to clogged canals and esteros."],
+    ["Typhoon","A severe weather disturbance characterized by strong winds and heavy rains revolving around a central low pressure area (LPA)."],
+    ["Tropical Depression","Type 1 tropical cyclone — wind speed up to 62 kph."],
+    ["Tropical Storm","Type 2 tropical cyclone — wind speed ranging from 63–118 kph."],
+    ["Typhoon (wind speed)","Type 3 tropical cyclone — wind speed greater than 118 kph."],
+    ["Storm Surge","Localized unusual increase of sea water level above the predicted astronomical tide level, due to intense winds and low atmospheric pressure accompanying intense tropical cyclones."],
+    ["Mangrove","Known as frontlines against coastal hazards — reduces wave damage from typhoons and tsunamis, and roots strongly bind soils together."],
+    ["El Nino","Prolonged unusual warming of sea surface temperatures in the central and eastern equatorial Pacific. Strategy: plant drought-resistant crops."],
+    ["Effects of El Nino","Land degradation, forest wildfires, water quality deterioration, reduced hydroelectric power, reduced domestic water supply, drought, outbreak of pests and diseases."],
+    ["La Nina","Prolonged unusual cooling of sea surface temperatures in the central and eastern equatorial Pacific. May last 1-3 years."],
+    ["Effects of La Nina","Flooding, increase in number of tropical cyclones, above-normal rainfall."],
+  ],
+  "Rainfall Advisory": [
+    ["Rainfall Advisory — RED","More than 30 mm of rain observed in 1 hour and expected to continue in the next 2 hours. Action: EVACUATION."],
+    ["Rainfall Advisory — ORANGE","15-30 mm of rain observed in 1 hour and expected to continue in the next 2 hours. Action: ALERT."],
+    ["Rainfall Advisory — YELLOW","7.5 to 15 mm of rain observed in 1 hour and expected to continue in the next 2 hours. Action: MONITOR."],
+  ],
+  "Fire Hazard": [
+    ["Fire","The perceptible phase of burning or combustion — the chemical reaction between oxygen, fuel, and heat."],
+    ["Fuel (combustion)","Material or substance being oxidized or burned in the combustion process."],
+    ["Oxygen (combustion)","Air; the oxidizing agent in the fire tetrahedron."],
+    ["Heat (combustion)","Enough energy to make the fuel burn."],
+    ["Self-Sustained Chemical Reaction","The 4th component of combustion — the chain reaction that keeps fire burning."],
+    ["COOLING (extinguishing fire)","Reducing the temperature of the fire."],
+    ["STARVING (extinguishing fire)","Removal of available fuel to put out the fire."],
+    ["BLANKETING (extinguishing fire)","Exclusion of oxygen to extinguish the fire."],
+    ["INHIBITION (extinguishing fire)","To prevent or forbid — breaking the chemical chain reaction."],
+    ["Fire Class A","Combustible materials — wood, fabric, paper, plastic, rubber."],
+    ["Fire Class B","Flammable liquids and gas — propane, solvents, oils, alcohol."],
+    ["Fire Class C","Electrical appliances — computers, fax machines."],
+    ["Fire Class D","Electric materials — lithium, titanium, sodium, potassium, magnesium."],
+    ["Fire Class K","Cooking appliances — oils, animal and vegetable fats."],
+    ["Why know fire classes?","Because certain fires can only be fought with certain fire extinguishers."],
+    ["BFP","Bureau of Fire Protection — government agency primarily responsible for enforcing and administering the Fire Code of the Philippines (RA 9514)."],
+    ["Mitigation / Prevention (fire)","Act of doing things that prevent the actual emergency. Example: installation of building fire control facilities."],
+    ["Response (fire)","Phase that includes all necessary emergency services and equipment before, during, and after a fire hazard. Risk assessment is the first step."],
+    ["Recovery (fire)","Actions done for recovery of damages caused by fire — includes restoration of basic services and repair of physical, economic, and social damages."],
+    ["Reconstruction / Rebuild (fire)","Rebuilding community services and facilities to at least equivalent levels to those existing before the emergency."],
+    ["If unable to evacuate a burning building","Stay low under the smoke. Do NOT open windows or doors — this introduces oxygen and intensifies the fire."],
+  ],
+};
+
+const COLORS = {
+  "All":              { bg: "#E6F1FB", text: "#0C447C" },
+  "DRR Overview":     { bg: "#EAF3DE", text: "#27500A" },
+  "Laws & Agencies":  { bg: "#EEEDFE", text: "#3C3489" },
+  "ICS":              { bg: "#FAEEDA", text: "#633806" },
+  "Hazards":          { bg: "#E1F5EE", text: "#085041" },
+  "Rainfall Advisory":{ bg: "#FFF2CC", text: "#7D5700" },
+  "Fire Hazard":      { bg: "#FAECE7", text: "#712B13" },
+};
+
+let deck = [], idx = 0, flipped = false, currentLesson = "All";
+
+function buildAllDeck() {
+  let all = [];
+  for (const [lesson, cards] of Object.entries(LESSONS)) {
+    if (!cards) continue;
+    cards.forEach(([q, a]) => all.push({ lesson, q, a }));
+  }
+  return all;
+}
+
+function buildDeck(lesson) {
+  if (!lesson || lesson === "All") return buildAllDeck();
+  return (LESSONS[lesson] || []).map(([q, a]) => ({ lesson, q, a }));
+}
+
+function shuffleDeck() {
+  for (let i = deck.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [deck[i], deck[j]] = [deck[j], deck[i]];
+  }
+  idx = 0; flipped = false;
+  document.getElementById('card-inner').classList.remove('flipped');
+  renderCard();
+}
+
+function setLesson(lesson) {
+  currentLesson = lesson;
+  deck = buildDeck(lesson);
+  idx = 0; flipped = false;
+  document.getElementById('card-inner').classList.remove('flipped');
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + lesson).classList.add('active');
+  renderCard();
+}
+
+function flipCard() {
+  flipped = !flipped;
+  document.getElementById('card-inner').classList.toggle('flipped', flipped);
+}
+
+function move(dir) {
+  const newIdx = idx + dir;
+  if (newIdx < 0 || newIdx >= deck.length) return;
+  flipped = false;
+  document.getElementById('card-inner').classList.remove('flipped');
+  idx = newIdx;
+  setTimeout(renderCard, 50);
+}
+
+function renderCard() {
+  const card = deck[idx];
+  if (!card) return;
+  const col = COLORS[card.lesson] || COLORS["All"];
+  const tag = document.getElementById('card-lesson-tag');
+  tag.textContent = card.lesson;
+  tag.style.background = col.bg;
+  tag.style.color = col.text;
+  document.getElementById('card-q').textContent = card.q;
+  document.getElementById('card-a').textContent = card.a;
+  document.getElementById('prog-label').textContent = (idx+1) + " / " + deck.length;
+  document.getElementById('prog-fill').style.width = ((idx+1)/deck.length*100) + "%";
+  document.getElementById('counter').textContent = "Card " + (idx+1) + " of " + deck.length;
+  document.getElementById('prev-btn').disabled = idx === 0;
+  document.getElementById('next-btn').disabled = idx === deck.length - 1;
+}
+
+function buildTabs() {
+  const container = document.getElementById('tabs');
+  const names = ["All","DRR Overview","Laws & Agencies","ICS","Hazards","Rainfall Advisory","Fire Hazard"];
+  names.forEach(name => {
+    const btn = document.createElement('button');
+    btn.className = 'tab-btn' + (name === "All" ? " active" : "");
+    btn.id = 'tab-' + name;
+    const count = name === "All" ? buildAllDeck().length : (LESSONS[name] || []).length;
+    btn.textContent = name + " (" + count + ")";
+    btn.onclick = () => setLesson(name);
+    container.appendChild(btn);
+  });
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); flipCard(); }
+  else if (e.key === 'ArrowLeft') move(-1);
+  else if (e.key === 'ArrowRight') move(1);
+  else if (e.key === 's' || e.key === 'S') shuffleDeck();
+});
+
+buildTabs();
+deck = buildDeck("All");
+renderCard();
+</script>
+</body>
+</html>
