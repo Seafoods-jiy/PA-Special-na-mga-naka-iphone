@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>4th Quarter Arts Reviewer — Flashcards</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #ffffff;
+    --bg-secondary: #f5f5f3;
+    --bg-tertiary: #eeece8;
+    --text: #1a1a1a;
+    --text-secondary: #666660;
+    --border: rgba(0,0,0,0.12);
+    --border-md: rgba(0,0,0,0.22);
+    --blue: #185FA5;
+    --blue-light: #E6F1FB;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1c1c1a;
+      --bg-secondary: #252522;
+      --bg-tertiary: #2e2e2b;
+      --text: #f0ede8;
+      --text-secondary: #999890;
+      --border: rgba(255,255,255,0.1);
+      --border-md: rgba(255,255,255,0.2);
+      --blue: #5BA4E8;
+      --blue-light: #0C2A45;
+    }
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: var(--bg-tertiary);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 2rem 1rem;
+  }
+
+  .page-wrap {
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  header h1 {
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  header p {
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+
+  .lesson-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 1.25rem;
+  }
+
+  .tab-btn {
+    padding: 6px 13px;
+    border-radius: 20px;
+    border: 0.5px solid var(--border-md);
+    background: var(--bg);
+    color: var(--text-secondary);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+
+  .tab-btn:hover { background: var(--bg-secondary); }
+
+  .tab-btn.active {
+    background: var(--blue);
+    color: #fff;
+    border-color: var(--blue);
+  }
+
+  .progress-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 1rem;
+  }
+
+  .prog-bar {
+    flex: 1;
+    height: 5px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .prog-fill {
+    height: 100%;
+    background: var(--blue);
+    border-radius: 3px;
+    transition: width 0.3s;
+  }
+
+  .prog-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+  }
+
+  .card-area {
+    perspective: 900px;
+    margin-bottom: 1rem;
+    cursor: pointer;
+    user-select: none;
+    min-height: 220px;
+  }
+
+  .card-inner {
+    position: relative;
+    width: 100%;
+    min-height: 220px;
+    transform-style: preserve-3d;
+    transition: transform 0.45s;
+  }
+
+  .card-inner.flipped { transform: rotateY(180deg); }
+
+  .card-face {
+    position: absolute;
+    width: 100%;
+    min-height: 220px;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1.5rem;
+    text-align: center;
+  }
+
+  .card-front { background: var(--bg); }
+  .card-back  { background: var(--bg-secondary); transform: rotateY(180deg); }
+
+  .lesson-label {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 12px;
+    margin-bottom: 0.75rem;
+    letter-spacing: 0.02em;
+  }
+
+  .card-tag {
+    font-size: 11px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-bottom: 0.75rem;
+  }
+
+  .card-q {
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.5;
+  }
+
+  .card-a {
+    font-size: 15px;
+    color: var(--text);
+    line-height: 1.7;
+  }
+
+  .card-hint {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 1.25rem;
+  }
+
+  .nav-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 0.75rem;
+  }
+
+  .nav-btn, .shuffle-btn {
+    padding: 8px 20px;
+    border-radius: var(--radius-md);
+    border: 0.5px solid var(--border-md);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.12s;
+    font-family: inherit;
+  }
+
+  .nav-btn:hover, .shuffle-btn:hover { background: var(--bg-secondary); }
+  .nav-btn:disabled { opacity: 0.35; cursor: default; }
+
+  .shuffle-btn {
+    color: var(--text-secondary);
+    font-size: 13px;
+  }
+
+  .counter {
+    font-size: 13px;
+    color: var(--text-secondary);
+    text-align: center;
+    margin-top: 0.5rem;
+  }
+
+  .keyboard-hint {
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 0.5px solid var(--border);
+  }
+
+  kbd {
+    display: inline-block;
+    padding: 1px 6px;
+    border: 0.5px solid var(--border-md);
+    border-radius: 4px;
+    font-size: 11px;
+    font-family: inherit;
+    background: var(--bg-secondary);
+  }
+</style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <header>
+    <h1>4th Quarter Arts Reviewer</h1>
+    <p>Flashcards — Lessons 5, 6, 8, 9 &amp; 10</p>
+  </header>
+
+  <div class="lesson-tabs" id="tabs"></div>
+
+  <div class="progress-row">
+    <div class="prog-bar"><div class="prog-fill" id="prog-fill"></div></div>
+    <span class="prog-label" id="prog-label">1 / 1</span>
+  </div>
+
+  <div class="card-area" id="card-area" onclick="flipCard()">
+    <div class="card-inner" id="card-inner">
+      <div class="card-face card-front">
+        <div class="lesson-label" id="card-lesson-tag"></div>
+        <div class="card-tag">Term / Concept</div>
+        <div class="card-q" id="card-q">Loading...</div>
+        <div class="card-hint">Click to reveal answer</div>
+      </div>
+      <div class="card-face card-back">
+        <div class="card-tag">Definition / Answer</div>
+        <div class="card-a" id="card-a"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-row">
+    <button class="nav-btn" id="prev-btn" onclick="move(-1)">&#8592; Prev</button>
+    <button class="shuffle-btn" onclick="shuffleDeck()">&#x21C4; Shuffle</button>
+    <button class="nav-btn" id="next-btn" onclick="move(1)">Next &#8594;</button>
+  </div>
+
+  <div class="counter" id="counter"></div>
+
+  <div class="keyboard-hint">
+    <kbd>Space</kbd> flip &nbsp;&nbsp; <kbd>&#8592;</kbd> prev &nbsp;&nbsp; <kbd>&#8594;</kbd> next &nbsp;&nbsp; <kbd>S</kbd> shuffle
+  </div>
+
+</div>
+
+<script>
+const LESSONS = {
+  "All": null,
+  "L5: Techniques": [
+    ["Collage","Adhering flat elements (newspaper clippings, photos, cloth, string, etc.) to a surface to create a thick, layered artwork almost like a relief sculpture."],
+    ["Decalcomania","Applying gouache to paper or glass then transferring a reversed image onto canvas. Produces spontaneous, dream-like imagery bridging unconscious thought with art."],
+    ["Decoupage","Adhering paper cut-outs to a surface then coating with one or more layers of transparent varnish. Budget-friendly, therapeutic, and great for upcycling objects."],
+    ["Frottage","Rubbing crayon on paper placed over a textured object (leaves, wood, embossed metal) to transfer the impression. Enables Surrealist 'automatic' creation."],
+    ["Montage (Image Assembly)","Combining images or cut-outs to create a new artwork. Used for posters, editorials, and visual storytelling."],
+    ["Montage (Digital)","Photography or film where images are juxtaposed or overlapped to form a new picture. Compresses time, builds emotional impact, and conveys complex narratives."],
+  ],
+  "L6: Visual Arts": [
+    ["What is Visual Art?","Any form of art primarily experienced through sight. Can be 2D or 3D. Encompasses drawing, painting, sculpture, printmaking, photography, and more."],
+    ["Contouring","Drawing the outline of an object without lifting the drawing tool."],
+    ["Gesture Drawing","Capturing the essence or movement of a subject with quick, expressive lines."],
+    ["Hatching","Using closely spaced parallel lines to create shading and texture."],
+    ["Cross-Hatching","Intersecting lines used to create shading and texture."],
+    ["Stippling","Creating shading and texture by applying small dots or points."],
+    ["Scribbling","Expressive, loose technique using rapid marks (loops, lines, zigzags) to form images and build tonal values."],
+    ["Circling","Small, continuous, tight circular motions — often with colored pencils — for smooth, layered, uniform coverage."],
+    ["Finger Blend","Direct-contact technique using fingertip pressure to transition colors, soften edges, and create textures. Works well with oil pastels and acrylics."],
+    ["Wet-on-Wet (painting)","Applying paint on a wet surface — allows colors to blend and create smooth transitions."],
+    ["Wet-on-Dry (painting)","Applying paint to a dry surface — gives more control and detail."],
+    ["Glazing","Layering thin, transparent washes of color to create depth and richness."],
+    ["Impasto","Applying thick layers of paint with a palette knife or brush to create texture and dimension."],
+    ["Sgraffito","Scratching through layers of wet paint to reveal underlying colors or textures."],
+    ["Carving (sculpture)","Cutting away at a solid block of wood or stone. Traditional tools: chisels, gouges, hammers. Modern: power tools and lasers."],
+    ["Modeling (sculpture)","Molding a soft or malleable material like clay or wax to create a desired form."],
+    ["Casting (sculpture)","Melting a material (usually metal), pouring into a mold, then allowing it to harden."],
+    ["Assembling (sculpture)","Joining preformed pieces of material to create a composition."],
+    ["Relief Printing","Carving away material from a block to create a raised surface, which is inked and transferred onto paper."],
+    ["Intaglio","Incising or etching lines into a metal plate, which is inked and pressed onto paper."],
+    ["Lithography","Drawing directly onto flat stone or metal with greasy material, then chemically treated and inked."],
+    ["Screen Printing","Transferring ink through a stencil onto a surface using a mesh screen."],
+    ["Industrial Design","Professional practice of designing products and services for mass production. Bridges art, business, and engineering."],
+    ["Graphic Design","Creating visual content using typography, imagery, color, and layout to communicate messages for print and digital media."],
+    ["Fashion Design","Using imagination and expression to make clothing and accessories. Must be both aesthetically pleasing and functionally useful."],
+    ["Interior Design","Art and science of enhancing a building's interior. Key principles: balance, harmony, scale, and contrast."],
+    ["Monochrome Photography","Removes color to emphasize contrast, texture, shapes, and lighting."],
+    ["Motion Blur","Conveys speed or time passage using a slow shutter speed (1/10 to 1/50 seconds or slower)."],
+    ["Macro Photography","Extreme close-ups of small subjects, showing details invisible to the naked eye."],
+    ["Reflection Photography","Uses surfaces like water, glass, or metal to add symmetry and depth."],
+    ["Panoramic Stitching","Joining a series of overlapping images in post-processing to create a high-resolution, wide-angle image."],
+    ["Embroidery","Decorating fabric using a needle to apply thread or yarn."],
+    ["Ceramics","Shaping clay and other minerals then firing at high temperatures in a kiln to make them hard and heat-resistant."],
+    ["Weaving","Fabric production where yarns are interlaced at right angles on a loom."],
+    ["Paper Art","Includes origami (folding paper into shapes) and quilling (rolling paper strips)."],
+  ],
+  "L8: Architecture": [
+    ["Architecture","The art and technique of designing and building — both the process and the product of sketching, conceiving, planning, designing, and constructing structures."],
+    ["Area of Ground","An undefined or defined surface — may blend into its surroundings. The most basic architectural element."],
+    ["Raised Area / Platform","A level horizontal surface lifted above natural ground. Examples: stage, terrace, table, altar, shelf."],
+    ["Lowered Area / Pit","Formed by excavation below ground level. Examples: grave, sunken garden, swimming pool."],
+    ["Marker","Identifies a particular place by occupying the spot and standing out. Examples: tombstone, flagpole, office building."],
+    ["Focus","From Latin for 'hearth.' Any element upon which concentration is brought. Examples: fireplace, altar, throne, artwork."],
+    ["Barrier","Divides one place from another. Examples: wall, fence, hedge, moat."],
+    ["Roof / Canopy","Shelters a place from sun or rain, and implies a defined area beneath it."],
+    ["Paths","A route along which one moves — may be straight, irregular, or inclined (ramp, stair, ladder)."],
+    ["Openings","Doorways (for passing between places) and windows (for light, air, and sight)."],
+    ["Apartment","A building composed of many residential units. Usually built in urban areas. Evolved into condominiums."],
+    ["Bahay na Bato","Residence of the wealthy. Two-story: stone/brick ground floor, wooden upper level."],
+    ["Barong-Barong","Informal houses of the landless poor, built on any available land — near esteros, riverbanks, and vacant lots."],
+    ["Bungalow","One-story house with a wide front porch and large windows. May have a roofed or open terrace."],
+    ["Bahay Kubo","Ethnic house of Christian peasant families in lowland areas. Pile construction, roof sloping in all sides, sliding windows."],
+    ["Houseboat","A boat that also serves as a dwelling. Typically used by the Badjaos or Sama Laut."],
+    ["Capitol / Kapitolyo","Building of the provincial government. Most feature columns and pediments on the exterior."],
+    ["Town Hall / Munisipyo","Building of the municipal government. Houses offices of the mayor, municipal council, and court."],
+    ["Church / Simbahan","Place of worship for a Christian congregation. Design depends on denomination (Roman Catholic, Aglipayan, Protestant, INC)."],
+    ["Cemetery","Place where people bury the dead. Has other names: Kampo Santo, Pantyon, Libingan. Features chapel, vaults/nichos, mausoleums."],
+    ["Theater (Teatro)","Building for dance, musical, and theatrical presentations. Unlike an auditorium, it is a standalone separate building."],
+    ["Lighthouse / Parola","Structure on an island, peninsula, or rock to help ships pass through narrow areas safely."],
+    ["Bridge / Tulay","Horizontal structure serving as a passageway between two areas separated by water, a hollow, or a road."],
+    ["Architectural Sketches","Fast and expressive drawings that convey the basic idea and the architect's individual style. The most practical tool."],
+    ["Architectural Plans","Present architecture in specific proportions — the most accurate way to define spatial dimensions in the Cartesian plane."],
+    ["Architectural Models","3D representations that allow observation of volumetric composition from various points of view."],
+    ["Renders / 3D Visualizations","2D compositions from 3D digital models in a realistic style. Estimates what a completed work will look like."],
+    ["Virtual Reality (Architecture)","The only tool that lets observers fully immerse themselves in unbuilt architecture using 3D digital models and VR headsets."],
+  ],
+  "L9: Film & Media": [
+    ["Film","A work of visual art using moving images to simulate experiences that communicate ideas, stories, feelings, or atmosphere."],
+    ["Broadcasting Art","Transmission of programs by radio or television to a large dispersed audience using the electromagnetic spectrum."],
+    ["Cinema Cameras","Specialized cameras for high-quality motion pictures. Resolutions above 4K. Superior image quality and dynamic range."],
+    ["Consumer Camcorders","Portable combination of a TV camera, video recorder, and sync pulse generator. Typically 2–5 megapixels."],
+    ["Professional Camcorders","Designed for Electronic News Gathering (ENG) and live events. Prioritizes realism and deep focus."],
+    ["Prosumer Camcorders","Gear with professional features (XLR audio, manual rings) in a consumer-friendly body. Ideal for documentaries."],
+    ["Low Angle","Camera positioned below average eye line, pointing up. Makes subjects appear powerful or dominant."],
+    ["Normal / Straight Angle","Frames the subject from below their eyeline — the most neutral, natural perspective."],
+    ["High Camera Angle","Camera looks down on the character from above. Can make subjects appear smaller or vulnerable."],
+    ["Dutch Angle","Camera rotated around the lens axis — creates unease, tension, or disorientation."],
+    ["Bridging Shot","Shot inserted between scenes to show a change in time or place. Examples: clock face, falling calendar pages, seasonal changes."],
+    ["Color (film technique)","Used to set the tone of a scene. Red = passion/danger/power. Pink = innocence/femininity/beauty."],
+    ["Cucalorus / Coculorus","A 'cookie' — an essential lighting tool that creates shadow patterns and light textures to enhance visual depth and mood."],
+    ["Establishing Shot","Appears at the beginning of a scene to tell the viewer where and when the action takes place."],
+    ["Eyeline Match","Editing technique that shows what a character is seeing, making the audience feel they are looking through the character's eyes."],
+    ["Long Take","A single continuous shot lasting much longer than the conventional editing pace (can last several minutes)."],
+    ["Mise en Scène","Everything that appears before the camera — sets, props, costumes, actors, and lighting. From French: 'placing on stage.'"],
+    ["Montage (film)","A sequence of many short scenes edited together to condense the plot or convey the passage of time."],
+    ["Over the Shoulder Shot","Camera placed above the back of a subject's shoulder — places the viewer inside a character's perspective."],
+    ["Rack Shot / Focus Pull","Moves the focal plane from one object in the frame to another in a continuous shot."],
+    ["Extreme Long Shot (ELS)","Often the 'establishing shot.' Subject is tiny or invisible; focus is on the vast landscape or city."],
+    ["Long Shot (LS)","Subject's entire body is visible head to toe, but surroundings are still dominant."],
+    ["Medium Long Shot (MLS)","Also called the 'Plan Américain.' Frames from the knees up. Shows tools or props while keeping the face visible."],
+    ["Medium Shot (MS)","Frames from the waist up. The most natural shot, mimicking a normal conversation distance."],
+    ["Medium Close Up (MCU)","Frames from the chest up. Captures facial expressions clearly with some body language visible."],
+    ["Close Up (CU)","Fills the screen with the subject's face. Every blink and twitch is magnified."],
+    ["Super Close Up (SCU)","Frames from above the eyebrows to below the mouth. Uncomfortably intimate — focuses on eyes and mouth."],
+    ["Extreme Close Up (ECU)","Focuses on a specific detail — a single eye, a finger, a whisper. Creates intense focus or suspense."],
+  ],
+  "L10: Theater": [
+    ["Theater Art","A collaborative art form using live performances to tell stories to an audience. Combines acting, directing, set design, and more."],
+    ["Blackout","Turning off or fading out stage lighting to transition between scenes or events."],
+    ["Blocking","The exact placement on stage where an actor needs to be during a scene."],
+    ["Cross-Cutting","A technique where two or more scenes are performed on stage simultaneously."],
+    ["Curtain Call","When actors come out to bow and receive the audience's applause after a performance."],
+    ["Dramatic Pause","A quick pause by an actor to emphasize a moment, heighten anticipation, or add tension."],
+    ["Dramaturgy","Studying a play's setting, historical, physical, and social context — often involves visiting a location to research."],
+    ["Encore","From the French word meaning 'again.' A musical number performed after the curtain call."],
+    ["Fourth Wall Break (Aside)","When performers talk directly to the audience during the play. The 'fourth wall' is the imaginary space between stage and audience."],
+    ["Freeze Frame","When performers pause to showcase a still image (tableau) to illustrate a specific incident."],
+    ["Fringe Theater","A play that is unconventional or experimental in style or subject matter, usually in small or non-traditional spaces."],
+    ["Improvisation","Performing something spontaneous — either rehearsed (not on the script but practiced) or spontaneous (created on the spot)."],
+    ["Interval / Intermission","The break between sections of a performance, usually halfway through. Typically lasts 15–20 minutes."],
+    ["Intonation","The rising and falling of voice when delivering a speech or line."],
+    ["Quick Change","The technique of almost instantaneously changing costumes during a performance."],
+    ["Soliloquy","A scene where a character expresses internal thoughts out loud for the audience while talking to himself."],
+    ["Stage Whisper","A loud whisper by an actor intended to be heard by the audience but not by other characters."],
+    ["Thought Tunnel (Decision Alley)","A character walks past other characters who comment on their situation — used to analyze a decisive moment in detail."],
+    ["Voice in the Head","A technique used to recall the words said by characters or to hear what a character is thinking."],
+  ],
+};
+
+const LESSON_COLORS = {
+  "All":            { bg: "#E6F1FB", text: "#0C447C" },
+  "L5: Techniques": { bg: "#EEEDFE", text: "#3C3489" },
+  "L6: Visual Arts":{ bg: "#EAF3DE", text: "#27500A" },
+  "L8: Architecture":{ bg: "#FAEEDA", text: "#633806" },
+  "L9: Film & Media":{ bg: "#FAECE7", text: "#712B13" },
+  "L10: Theater":   { bg: "#E1F5EE", text: "#085041" },
+};
+
+let currentLesson = "All";
+let deck = [];
+let idx = 0;
+let flipped = false;
+
+function buildAllDeck() {
+  let all = [];
+  for (const [lesson, cards] of Object.entries(LESSONS)) {
+    if (!cards) continue;
+    cards.forEach(([q, a]) => all.push({ lesson, q, a }));
+  }
+  return all;
+}
+
+function buildDeck(lesson) {
+  if (!lesson || lesson === "All") return buildAllDeck();
+  return (LESSONS[lesson] || []).map(([q, a]) => ({ lesson, q, a }));
+}
+
+function shuffleDeck() {
+  for (let i = deck.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [deck[i], deck[j]] = [deck[j], deck[i]];
+  }
+  idx = 0;
+  flipped = false;
+  document.getElementById('card-inner').classList.remove('flipped');
+  renderCard();
+}
+
+function setLesson(lesson) {
+  currentLesson = lesson;
+  deck = buildDeck(lesson);
+  idx = 0;
+  flipped = false;
+  document.getElementById('card-inner').classList.remove('flipped');
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + lesson).classList.add('active');
+  renderCard();
+}
+
+function flipCard() {
+  flipped = !flipped;
+  document.getElementById('card-inner').classList.toggle('flipped', flipped);
+}
+
+function move(dir) {
+  const newIdx = idx + dir;
+  if (newIdx < 0 || newIdx >= deck.length) return;
+  flipped = false;
+  document.getElementById('card-inner').classList.remove('flipped');
+  idx = newIdx;
+  setTimeout(renderCard, 50);
+}
+
+function renderCard() {
+  const card = deck[idx];
+  if (!card) return;
+  const col = LESSON_COLORS[card.lesson] || LESSON_COLORS["All"];
+  const tag = document.getElementById('card-lesson-tag');
+  tag.textContent = card.lesson;
+  tag.style.background = col.bg;
+  tag.style.color = col.text;
+  document.getElementById('card-q').textContent = card.q;
+  document.getElementById('card-a').textContent = card.a;
+  const total = deck.length;
+  const current = idx + 1;
+  document.getElementById('prog-label').textContent = current + " / " + total;
+  document.getElementById('prog-fill').style.width = (current / total * 100) + "%";
+  document.getElementById('counter').textContent = "Card " + current + " of " + total;
+  document.getElementById('prev-btn').disabled = idx === 0;
+  document.getElementById('next-btn').disabled = idx === deck.length - 1;
+}
+
+function buildTabs() {
+  const container = document.getElementById('tabs');
+  const lessonNames = ["All", "L5: Techniques", "L6: Visual Arts", "L8: Architecture", "L9: Film & Media", "L10: Theater"];
+  lessonNames.forEach(name => {
+    const btn = document.createElement('button');
+    btn.className = 'tab-btn' + (name === "All" ? " active" : "");
+    btn.id = 'tab-' + name;
+    const count = name === "All" ? buildAllDeck().length : (LESSONS[name] || []).length;
+    btn.textContent = name + " (" + count + ")";
+    btn.onclick = () => setLesson(name);
+    container.appendChild(btn);
+  });
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); flipCard(); }
+  else if (e.key === 'ArrowLeft') move(-1);
+  else if (e.key === 'ArrowRight') move(1);
+  else if (e.key === 's' || e.key === 'S') shuffleDeck();
+});
+
+buildTabs();
+deck = buildDeck("All");
+renderCard();
+</script>
+</body>
+</html>
